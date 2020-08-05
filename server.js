@@ -1,11 +1,11 @@
 //Create express app
 const express = require('express');
 let app = express();
-
 //Database variables
 let mongo = require('mongodb');
 let MongoClient = mongo.MongoClient;
 let db;
+let cls;
 
 //View engine
 app.set("view engine", "pug");
@@ -13,12 +13,19 @@ app.set("view engine", "pug");
 //Set up the routes
 app.use(express.static("public"));
 app.get("/", sendIndex);
+//app.get("/", sendInd);
 app.get("/cards/:cardID", sendCard);
 
 function sendIndex(req, res, next){
-	res.render("index");
-}
 
+	db.collection("cards").distinct("cardClass", function(err, result){
+		cls = result;
+	});
+	db.collection("cards").distinct("rarity", function(err, result){
+		res.render("index",{cls:cls, rar:result});
+	});	
+	
+}
 function sendCard(req, res, next){
 	let oid;
 	try{
